@@ -4,6 +4,7 @@ import re
 import csv
 
 def getTds(fromStn, toStn):
+    '''Get the td tags'''
     print('scraping:' + fromStn+ "/" + toStn )
     sauce = urllib.request.urlopen('http://ojp.nationalrail.co.uk/service/timesandfares/' +fromStn+'/'+toStn+ '/today/1130/dep').read()
     soup = bs.BeautifulSoup(sauce, "lxml")
@@ -11,7 +12,7 @@ def getTds(fromStn, toStn):
     return tds
 
 def getDuration(tds):
-
+    '''Get the duration information from td tags'''
     mins = 0
     hrs = 0
     if not tds:
@@ -35,17 +36,14 @@ def getDuration(tds):
 #print(getDuration(getTds("ABW","AVY")))
 
 def getStationDict():
+    '''create a dictionary from the station_codes .csv file'''
     with open('station_codes.csv', mode='r') as infile:
         reader = csv.reader(infile)
         mydict = {rows[0]:rows[1] for rows in reader}
     return mydict
 
-stations = getStationDict()
-
-#print(stations["AVY"])
-keys = stations.keys()
-
 def getAllDurations(CRS_codes):
+    '''Get the duration for the CRS codes'''
     durations = []
     for fromStn in CRS_codes.keys():
         for toStn in CRS_codes[fromStn]:
@@ -57,6 +55,7 @@ def getAllDurations(CRS_codes):
     return durations
 
 def toCSV(filename, durations):
+    '''Save the data into a csv file'''
     with open(filename, 'w', newline='') as out:
         csv_out = csv.writer(out)
         csv_out.writerow(['From', 'to', 'duration'])
@@ -64,7 +63,9 @@ def toCSV(filename, durations):
             print(row)
             csv_out.writerow(row)
 
-
+stations = getStationDict()
+# print(stations["AVY"])
+keys = stations.keys()
 #print(getAllDurations(keys))
 stn = {}
 stn['LUT'] = ['KGX', 'BDM', 'NMP', 'LVC', 'GLC']
